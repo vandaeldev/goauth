@@ -1,15 +1,21 @@
 package main
 
 import (
-  "fmt"
-  "net/http"
+	"log"
+	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
-  http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "Hello World!")
-  })
-  fs := http.FileServer(http.Dir("static/"))
-  http.Handle("/static/", http.StripPrefix("/static/", fs))
-  http.ListenAndServe(":8080", nil)
+	InitDB()
+	defer CloseDB()
+	r := mux.NewRouter()
+	s := r.PathPrefix("/api/v1").Subrouter()
+	s.HandleFunc("/users", GetUsers).Methods("GET")
+	s.HandleFunc("/users/{id}", GetUser).Methods("GET")
+	s.HandleFunc("/users", CreateUser).Methods("POST")
+	s.HandleFunc("/users/{id}", UpdateUser).Methods("PUT")
+	s.HandleFunc("/users/{id}", DeleteUser).Methods("DELETE")
+	log.Fatal(http.ListenAndServe(":8888", r))
 }
