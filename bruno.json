@@ -1,0 +1,227 @@
+{
+  "name": "goauth",
+  "version": "1",
+  "items": [
+    {
+      "type": "http",
+      "name": "Delete User",
+      "seq": 6,
+      "request": {
+        "url": "{{scheme}}://{{host}}:{{port}}/api/v1/users/:id",
+        "method": "DELETE",
+        "headers": [],
+        "params": [
+          {
+            "name": "id",
+            "value": "1",
+            "type": "path",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{token}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Get user",
+      "seq": 3,
+      "request": {
+        "url": "{{scheme}}://{{host}}:{{port}}/api/v1/users/:id",
+        "method": "GET",
+        "headers": [],
+        "params": [
+          {
+            "name": "id",
+            "value": "1",
+            "type": "path",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{token}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Get users",
+      "seq": 2,
+      "request": {
+        "url": "{{scheme}}://{{host}}:{{port}}/api/v1/users",
+        "method": "GET",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{token}}"
+          }
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Login",
+      "seq": 7,
+      "request": {
+        "url": "{{scheme}}://{{host}}:{{port}}/api/v1/login",
+        "method": "POST",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"verysecret\"\n}",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {
+          "res": [
+            {
+              "name": "token",
+              "value": "res.body.token",
+              "enabled": true,
+              "local": false
+            }
+          ]
+        },
+        "assertions": [],
+        "tests": "",
+        "auth": {
+          "mode": "none"
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Signup",
+      "seq": 4,
+      "request": {
+        "url": "{{scheme}}://{{host}}:{{port}}/api/v1/signup",
+        "method": "POST",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "json",
+          "json": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"verysecret\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\"\n}",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "auth": {
+          "mode": "none"
+        }
+      }
+    },
+    {
+      "type": "http",
+      "name": "Update user",
+      "seq": 5,
+      "request": {
+        "url": "{{scheme}}://{{host}}:{{port}}/api/v1/users/:id",
+        "method": "PUT",
+        "headers": [],
+        "params": [
+          {
+            "name": "id",
+            "value": "1",
+            "type": "path",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "json",
+          "json": "{\n  \"email\": \"something@example.com\",\n  \"password\": \"secretvery\",\n  \"firstName\": \"Something\",\n  \"lastName\": \"Else\"\n}",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "auth": {
+          "mode": "bearer",
+          "bearer": {
+            "token": "{{token}}"
+          }
+        }
+      }
+    }
+  ],
+  "environments": [],
+  "root": {
+    "request": {
+      "vars": {
+        "req": [
+          {
+            "name": "scheme",
+            "value": "http",
+            "enabled": true,
+            "local": false,
+            "uid": "vzmESIxd8VgzEHOFHwxMe"
+          },
+          {
+            "name": "host",
+            "value": "localhost",
+            "enabled": true,
+            "local": false,
+            "uid": "WHZUFbwMVtJAj6I4geElW"
+          },
+          {
+            "name": "port",
+            "value": "8888",
+            "enabled": true,
+            "local": false,
+            "uid": "bEIXdOYKDYgC3lMiX6aBa"
+          }
+        ]
+      }
+    }
+  },
+  "brunoConfig": {
+    "version": "1",
+    "name": "goauth",
+    "type": "collection",
+    "ignore": [
+      ".git"
+    ]
+  }
+}
