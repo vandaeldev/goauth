@@ -14,10 +14,10 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	if result.Error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(result.Error.Error()))
-	} else {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(users)
+		return
 	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(users)
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
@@ -26,51 +26,79 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	result := GetDB().First(&user, "id = ?", id)
 	if result.Error != nil {
 		HandleResultErr(w, result)
-	} else {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(user)
+		return
 	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
+
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func Signup(w http.ResponseWriter, r *http.Request) {
 	var user User
 	json.NewDecoder(r.Body).Decode(&user)
+	hashed, err := HashPassword(user.Password)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	user.Password = hashed
 	result := GetDB().Create(&user)
 	if result.Error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(result.Error.Error()))
-	} else {
-		w.WriteHeader(http.StatusCreated)
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(user)
+		return
 	}
+	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
+
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	var userLogin User
+	var user User
+	json.NewDecoder(r.Body).Decode(&userLogin)
+	result := GetDB().First(&user, "email = ?", userLogin.Email)
+	if result.Error != nil {
+		HandleResultErr(w, result)
+		return
+	}
+	invalid := CheckPassword(user.Password, userLogin.Password)
+	if invalid {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(http.StatusText(http.StatusNotFound)))
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("{\"token\": \"token\"}"))
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	var user User
-	result := GetDB().First(&user, "id = ?", id)
-	if result.Error != nil {
-		HandleResultErr(w, result)
-	} else {
-		var updatedUser User
-		json.NewDecoder(r.Body).Decode(&updatedUser)
-		parsedID, err := strconv.ParseUint(id, 10, 64)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-		} else {
-			updatedUser.ID = uint(parsedID)
-			result := GetDB().Save(&updatedUser)
-			if result.Error != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(result.Error.Error()))
-			} else {
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(updatedUser)
-			}
-		}
+	userResult := GetDB().First(&user, "id = ?", id)
+	if userResult.Error != nil {
+		HandleResultErr(w, userResult)
+		return
 	}
+	var updatedUser User
+	json.NewDecoder(r.Body).Decode(&updatedUser)
+	parsedID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	updatedUser.ID = uint(parsedID)
+	result := GetDB().Save(&updatedUser)
+	if result.Error != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(result.Error.Error()))
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(updatedUser)
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -78,7 +106,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	result := GetDB().Delete(&User{}, id)
 	if result.Error != nil {
 		HandleResultErr(w, result)
-	} else {
-		w.WriteHeader(http.StatusNoContent)
+		return
 	}
+	w.WriteHeader(http.StatusNoContent)
 }
