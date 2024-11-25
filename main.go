@@ -7,27 +7,19 @@ import (
 	"os"
 	"os/signal"
 	"time"
-
-	"github.com/gorilla/mux"
 )
 
 func main() {
+	go GenerateKeyPair()
 	InitDB()
 	defer CloseDB()
-	r := mux.NewRouter()
-	s := r.PathPrefix("/api/v1").Subrouter()
-	s.HandleFunc("/users", GetUsers).Methods("GET")
-	s.HandleFunc("/users/{id}", GetUser).Methods("GET")
-	s.HandleFunc("/users/{id}", UpdateUser).Methods("PUT")
-	s.HandleFunc("/users/{id}", DeleteUser).Methods("DELETE")
-	s.HandleFunc("/signup", Signup).Methods("POST")
-	s.HandleFunc("/login", Login).Methods("POST")
+	router := InitRouter()
 	srv := &http.Server{
 		Addr:         "0.0.0.0:8888",
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
-		Handler:      r,
+		Handler:      router,
 	}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
@@ -40,6 +32,5 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
 	defer cancel()
 	srv.Shutdown(ctx)
-	log.Println("shutting down...")
 	os.Exit(0)
 }

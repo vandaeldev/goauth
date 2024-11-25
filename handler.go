@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -56,22 +57,30 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	var userLogin User
-	var user User
-	json.NewDecoder(r.Body).Decode(&userLogin)
-	result := GetDB().First(&user, "email = ?", userLogin.Email)
+	var (
+		creds User
+		user  User
+	)
+	json.NewDecoder(r.Body).Decode(&creds)
+	result := GetDB().First(&user, "email = ?", creds.Email)
 	if result.Error != nil {
 		HandleResultErr(w, result)
 		return
 	}
-	invalid := CheckPassword(user.Password, userLogin.Password)
-	if invalid {
+	if CheckPassword(user.Password, creds.Password) {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(http.StatusText(http.StatusNotFound)))
 		return
 	}
+	t, err := GenerateJWT(user)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	res := fmt.Sprintf("{\"token\": \"%s\"}", t)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{\"token\": \"token\"}"))
+	w.Write([]byte(res))
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
