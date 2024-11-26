@@ -69,7 +69,7 @@ func GenerateJWT(user User) (string, error) {
 	return t.SignedString(ed25519.PrivateKey(key))
 }
 
-func ValidateJWT(token string) (*jwt.Token, error) {
+func VerifyJWT(token string) (*jwt.Token, error) {
 	return jwt.NewParser(
 		jwt.WithIssuer("dev.vandael/goauth"),
 		jwt.WithExpirationRequired(),

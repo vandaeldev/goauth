@@ -12,6 +12,6 @@ func InitRouter() *mux.Router {
 	subRouter.HandleFunc("/{id}", GetUser).Methods("GET")
 	subRouter.HandleFunc("/{id}", UpdateUser).Methods("PUT")
 	subRouter.HandleFunc("/{id}", DeleteUser).Methods("DELETE")
-	subRouter.Use(ValidateToken)
+	subRouter.Use(VerifyToken)
 	return router
 }
