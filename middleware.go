@@ -14,7 +14,7 @@ func VerifyToken(next http.Handler) http.Handler {
 			w.Write([]byte(http.StatusText(http.StatusNotFound)))
 			return
 		}
-		token := strings.SplitAfter(bearerToken, BEARER)[0]
+		token := strings.SplitAfter(bearerToken, BEARER)[1]
 		if _, err := VerifyJWT(token); err != nil {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte(http.StatusText(http.StatusNotFound)))
