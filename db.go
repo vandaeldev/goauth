@@ -12,7 +12,7 @@ import (
 var db *gorm.DB
 
 func InitDB() {
-	dsn := "host=localhost user=postgres password=root dbname=goauth port=5432 sslmode=disable TimeZone=Europe/Amsterdam"
+	dsn := "host=postgres user=postgres password=root dbname=goauth port=5432 sslmode=disable TimeZone=Europe/Amsterdam"
 	conn, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Database connection failed: %s", err.Error())
